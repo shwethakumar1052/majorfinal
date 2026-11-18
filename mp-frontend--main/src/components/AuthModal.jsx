@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, User, Lock, Mail, Eye, EyeOff, LogIn, UserPlus, KeyRound, ArrowLeft } from "lucide-react";
+import axios from "axios";
 
 const STORAGE_KEY = "govmatch_user";
+const STORAGE_TOKEN = "govmatch_token";
 
 // mode: "login" | "register" | "forgot"
 export default function AuthModal({ open, onClose, onAuthChange }) {
@@ -47,12 +49,7 @@ export default function AuthModal({ open, onClose, onAuthChange }) {
       if (!email) { setError("Please enter your email address."); return; }
       setLoading(true);
       setTimeout(() => {
-        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-        if (!stored || stored.email !== email) {
-          setError("No account found with this email.");
-        } else {
-          setSuccess(`Password reset link sent to ${email}. (Demo: your password is stored locally)`);
-        }
+        setSuccess(`Password reset link sent to ${email}. (Demo: Feature coming soon)`);
         setLoading(false);
       }, 800);
       return;
@@ -63,24 +60,33 @@ export default function AuthModal({ open, onClose, onAuthChange }) {
     if (mode === "register" && password.length < 6) { setError("Password must be at least 6 characters."); return; }
 
     setLoading(true);
-    setTimeout(() => {
-      if (mode === "login") {
-        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-        if (!stored || stored.email !== email || stored.password !== password) {
-          setError("Invalid email or password.");
-          setLoading(false);
-          return;
-        }
-        onAuthChange(stored);
-      } else {
-        const user = { name, email, password, createdAt: Date.now() };
+
+    // Call backend API
+    const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
+    const payload = mode === "login" 
+      ? { email, password }
+      : { name, email, password };
+
+    axios.post(endpoint, payload)
+      .then(response => {
+        const { token, user } = response.data;
+        
+        // Store token and user info
+        localStorage.setItem(STORAGE_TOKEN, token);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+        
+        // Notify parent component
         onAuthChange(user);
-      }
-      setLoading(false);
-      reset();
-      onClose();
-    }, 600);
+        
+        setLoading(false);
+        reset();
+        onClose();
+      })
+      .catch(err => {
+        setLoading(false);
+        const errorMsg = err.response?.data?.error || "An error occurred. Please try again.";
+        setError(errorMsg);
+      });
   }
 
   const titles = {

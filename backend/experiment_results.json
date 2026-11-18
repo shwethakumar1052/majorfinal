@@ -1,0 +1,293 @@
+{
+  "datasetStats": {
+    "totalSchemes": 4430,
+    "categoryCounts": {
+      "Education & Learning": 1309,
+      "Health & Wellness": 322,
+      "Skills & Employment": 525,
+      "Social Welfare": 394,
+      "Women Empowerment": 308,
+      "Business & Entrepreneurship": 698,
+      "Agriculture, Rural & Environment": 874
+    },
+    "levelCounts": {
+      "Central": 671,
+      "State": 3759
+    }
+  },
+  "profileBenchmarks": {
+    "farmerProfile": {
+      "profileName": "Ramesh Kumar",
+      "occupation": "farmer",
+      "coldLatencyMs": 770,
+      "warmLatencyMs": 0,
+      "coverageFunnel": {
+        "totalSchemes": 4430,
+        "afterHardFilters": 537,
+        "afterCompatibility": 537,
+        "afterIntentMatch": 5,
+        "recommended": 5
+      },
+      "topRecommendations": [
+        {
+          "slug": "kcc",
+          "name": "Kisan Credit Card",
+          "category": "Agriculture, Rural & Environment",
+          "finalScore": 0.8385714285714287,
+          "starRating": 4,
+          "pct": 84,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "tdpspdstgmisg",
+          "name": "Tea Development and Promotion Scheme (TDPS): Plantation Development for Small Tea Growers (PDSTG): Mechanization for Individual Small Growers",
+          "category": "Agriculture, Rural & Environment",
+          "finalScore": 0.8385714285714287,
+          "starRating": 4,
+          "pct": 84,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "nsap ignoaps",
+          "name": "NSAP - Indira Gandhi National Old Age Pension Scheme",
+          "category": "Social Welfare",
+          "finalScore": 0.8185714285714286,
+          "starRating": 4,
+          "pct": 82,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "pmsy",
+          "name": "SVAMITVA Yojana (Survey of Villages and Mapping with Improvised Technology in Village Areas)",
+          "category": "Agriculture, Rural & Environment",
+          "finalScore": 0.8042857142857145,
+          "starRating": 4,
+          "pct": 80,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "pmecrg",
+          "name": "Prime Minister Early Career Research Grant",
+          "category": "Agriculture, Rural & Environment",
+          "finalScore": 0.7928571428571429,
+          "starRating": 4,
+          "pct": 79,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        }
+      ]
+    },
+    "studentProfile": {
+      "profileName": "Priya Sharma",
+      "occupation": "student",
+      "coldLatencyMs": 367,
+      "warmLatencyMs": 0,
+      "coverageFunnel": {
+        "totalSchemes": 4430,
+        "afterHardFilters": 597,
+        "afterCompatibility": 597,
+        "afterIntentMatch": 5,
+        "recommended": 5
+      },
+      "topRecommendations": [
+        {
+          "slug": "rdpws",
+          "name": "Research and Development Programme in Water Sector",
+          "category": "Education & Learning",
+          "finalScore": 0.8500000000000001,
+          "starRating": 4,
+          "pct": 85,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "nsap ignoaps",
+          "name": "NSAP - Indira Gandhi National Old Age Pension Scheme",
+          "category": "Social Welfare",
+          "finalScore": 0.8435714285714286,
+          "starRating": 4,
+          "pct": 84,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "orjcvsrva",
+          "name": "Opening And Running Junior Colleges For VJNT Students Run By Voluntary Agencies",
+          "category": "Education & Learning",
+          "finalScore": 0.8385714285714287,
+          "starRating": 4,
+          "pct": 84,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "vphdseitftphdc",
+          "name": "Visvesvaraya PhD Scheme for Electronics and IT: Full Time PhD Candidates",
+          "category": "Education & Learning",
+          "finalScore": 0.8385714285714287,
+          "starRating": 4,
+          "pct": 84,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "fesmwpnie",
+          "name": "Free Education For Sports Medal Winners / Participants Of National/ International Events",
+          "category": "Education & Learning",
+          "finalScore": 0.8385714285714287,
+          "starRating": 4,
+          "pct": 84,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        }
+      ]
+    },
+    "seniorProfile": {
+      "profileName": "Lakshmi Devi",
+      "occupation": "retired",
+      "coldLatencyMs": 439,
+      "warmLatencyMs": 0,
+      "coverageFunnel": {
+        "totalSchemes": 4430,
+        "afterHardFilters": 735,
+        "afterCompatibility": 735,
+        "afterIntentMatch": 5,
+        "recommended": 5
+      },
+      "topRecommendations": [
+        {
+          "slug": "igndpstn",
+          "name": "Indira Gandhi National Disability Pension Scheme - Tamil Nadu",
+          "category": "Women Empowerment",
+          "finalScore": 0.8185714285714286,
+          "starRating": 4,
+          "pct": 82,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "nsap ignoaps",
+          "name": "NSAP - Indira Gandhi National Old Age Pension Scheme",
+          "category": "Social Welfare",
+          "finalScore": 0.8185714285714286,
+          "starRating": 4,
+          "pct": 82,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "soegftporboa",
+          "name": "Scheme of Extending Grants for the Publication of Rare Books on Arts",
+          "category": "Social Welfare",
+          "finalScore": 0.7842857142857145,
+          "starRating": 4,
+          "pct": 78,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "oahtn",
+          "name": "Old Age Homes - Tamil Nadu",
+          "category": "Social Welfare",
+          "finalScore": 0.7785714285714287,
+          "starRating": 4,
+          "pct": 78,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        },
+        {
+          "slug": "affdf serious disease treatment",
+          "name": "AFFDF-Financial Assistance For Treatment Of Serious Diseases To Non Pensioner Ex-Servicemen (All Ranks)/Widows",
+          "category": "Health & Wellness",
+          "finalScore": 0.7707142857142858,
+          "starRating": 4,
+          "pct": 77,
+          "eligibilityScore": 0.8,
+          "semanticScore": 0.7,
+          "intentScore": 0.9,
+          "educationScore": 1
+        }
+      ]
+    }
+  },
+  "testSuite": {
+    "totalTests": 55,
+    "passedTests": 55,
+    "failedTests": 0,
+    "testSuites": 1,
+    "passRatePercent": 100,
+    "executionTimeSeconds": 5.92,
+    "testedModules": [
+      {
+        "module": "Eligibility Filtering Engine",
+        "tests": 14,
+        "passRate": 100
+      },
+      {
+        "module": "Adaptive Compatibility Scoring",
+        "tests": 11,
+        "passRate": 100
+      },
+      {
+        "module": "Domain Detection & Education Match",
+        "tests": 7,
+        "passRate": 100
+      },
+      {
+        "module": "Explainability & Star Rating (XAI)",
+        "tests": 9,
+        "passRate": 100
+      },
+      {
+        "module": "Profile Intelligence & Cold Start",
+        "tests": 6,
+        "passRate": 100
+      },
+      {
+        "module": "Chat & Context Transformer",
+        "tests": 8,
+        "passRate": 100
+      }
+    ]
+  },
+  "latencyBreakdown": {
+    "coldCachePipelineMs": 770,
+    "warmCacheHitMs": 0,
+    "nlpVectorSearchMs": 42.5,
+    "hardEligibilityFilteringMs": 18.2,
+    "compatibilityScoringMs": 14.8,
+    "explainabilityGenerationMs": 6.5
+  }
+}

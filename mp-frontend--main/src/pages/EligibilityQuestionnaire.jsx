@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ChevronLeft, CheckCircle2, Users } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { profileAPI } from "../services/apiService";
 
 const STEPS = [
   { title: "Basic Info",          subtitle: "Tell us about yourself" },
@@ -352,10 +353,41 @@ export default function EligibilityQuestionnaire() {
 
   function set(key, val) { setData(prev => ({ ...prev, [key]: val })); }
 
-  function handleNext() {
-    if (step < STEPS.length - 1) setStep(s => s + 1);
-    else {
+  async function handleNext() {
+    if (step < STEPS.length - 1) {
+      setStep(s => s + 1);
+    } else {
+      // Save to localStorage (backward compatibility)
       localStorage.setItem("govmatch_profile", JSON.stringify(data));
+      
+      // Try to save to database if user is logged in
+      const token = localStorage.getItem("govmatch_token");
+      if (token) {
+        try {
+          await profileAPI.saveProfile({
+            age: data.age,
+            gender: data.gender,
+            state: data.state,
+            district: data.district,
+            area: data.area,
+            occupation: data.occupation,
+            employmentStatus: data.employmentStatus,
+            annualIncome: data.annualIncome,
+            education: data.education,
+            caste: data.caste,
+            minority: data.minority,
+            disability: data.disability,
+            bplCard: data.bplCard,
+            isStudent: data.isStudent,
+            isWidow: data.isWidow,
+            goal: data.goal,
+          });
+        } catch (error) {
+          // Non-blocking: continue to results even if save fails
+          console.warn("Profile save failed, but continuing:", error);
+        }
+      }
+      
       navigate("/results");
     }
   }

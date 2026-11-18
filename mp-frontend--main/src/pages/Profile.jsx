@@ -1,37 +1,84 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, MapPin, Briefcase, Save, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { profileAPI } from "../services/apiService";
 
 const STORAGE_USER = "govmatch_user";
 const STORAGE_PROFILE = "govmatch_profile";
+const STORAGE_TOKEN = "govmatch_token";
 
 export default function Profile({ user, onAuthChange }) {
   const navigate = useNavigate();
-  const stored = JSON.parse(localStorage.getItem(STORAGE_PROFILE) || "{}");
+  const storedLocal = JSON.parse(localStorage.getItem(STORAGE_PROFILE) || "{}");
 
   const [form, setForm] = useState({
     name:       user?.name || "",
     email:      user?.email || "",
-    state:      stored.state || "",
-    occupation: stored.occupation || "",
-    age:        stored.age || "",
+    state:      storedLocal.state || "",
+    occupation: storedLocal.occupation || "",
+    age:        storedLocal.age || "",
   });
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  function handleSave(e) {
+  // Load profile from database if logged in
+  useEffect(() => {
+    const token = localStorage.getItem(STORAGE_TOKEN);
+    if (token && user) {
+      profileAPI.getProfile()
+        .then(response => {
+          const { profile: dbProfile } = response;
+          if (dbProfile) {
+            setForm(prev => ({
+              ...prev,
+              state: dbProfile.state || prev.state,
+              occupation: dbProfile.occupation || prev.occupation,
+              age: dbProfile.age || prev.age,
+            }));
+          }
+        })
+        .catch(error => {
+          console.warn("Could not load profile from database:", error);
+        });
+    }
+  }, [user]);
+
+  async function handleSave(e) {
     e.preventDefault();
+    setLoading(true);
+
+    // Update user info in localStorage
     const updated = { ...user, name: form.name, email: form.email };
     localStorage.setItem(STORAGE_USER, JSON.stringify(updated));
-    const updatedProfile = { ...stored, state: form.state, occupation: form.occupation, age: form.age };
+    
+    // Update profile in localStorage (backward compatibility)
+    const updatedProfile = { ...storedLocal, state: form.state, occupation: form.occupation, age: form.age };
     localStorage.setItem(STORAGE_PROFILE, JSON.stringify(updatedProfile));
+
+    // Try to save to database if logged in
+    const token = localStorage.getItem(STORAGE_TOKEN);
+    if (token) {
+      try {
+        await profileAPI.updateProfile({
+          state: form.state,
+          occupation: form.occupation,
+          age: form.age,
+        });
+      } catch (error) {
+        console.warn("Database update failed, but localStorage updated:", error);
+      }
+    }
+
     onAuthChange?.(updated);
+    setLoading(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   }
 
   function handleLogout() {
     localStorage.removeItem(STORAGE_USER);
+    localStorage.removeItem(STORAGE_TOKEN);
     onAuthChange?.(null);
     navigate("/");
   }
@@ -98,8 +145,8 @@ export default function Profile({ user, onAuthChange }) {
         ))}
 
         <div className="flex gap-3 mt-2">
-          <button type="submit" className="btn-primary flex items-center gap-2 text-sm">
-            <Save size={14} /> Save Changes
+          <button type="submit" disabled={loading} className="btn-primary flex items-center gap-2 text-sm">
+            <Save size={14} /> {loading ? "Saving..." : "Save Changes"}
           </button>
           {saved && <span className="text-sm flex items-center" style={{ color: "var(--success)" }}>✓ Saved!</span>}
         </div>

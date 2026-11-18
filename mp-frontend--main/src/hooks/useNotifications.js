@@ -18,10 +18,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 const WS_PATH = "/ws/notifications";
 
-// Reconnect: 1st retry instant, then cap at 10 s
+// Reconnect backoff (min 2s, max 15s)
 function nextDelay(attempt) {
-  if (attempt === 0) return 0;
-  return Math.min(1000 * 2 ** (attempt - 1), 10_000);
+  return Math.min(2000 * 2 ** Math.min(attempt, 4), 15_000);
 }
 
 export function useNotifications() {

@@ -28,6 +28,11 @@ const {
 const notifService    = require("./notifications/notificationService");
 const notifRoutes     = require("./notifications/notificationRoutes");
 
+// Database & Auth
+const { initializeDatabase } = require("./database/init");
+const { router: authRoutes } = require("./auth/authRoutes");
+const profileRoutes           = require("./profile/profileRoutes");
+
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
@@ -84,24 +89,49 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
-// Mount notification REST routes
+// Initialize database
+initializeDatabase();
+
+// Mount routes
+app.use("/api/auth", authRoutes);
+app.use("/api", profileRoutes);
 app.use("/api", notifRoutes);
 
-// Init notification WebSocket server on /ws/notifications
-notifService.initWebSocketServer(server);
+// Init notification WebSocket server
+const notifWss = notifService.initWebSocketServer();
 
 // Legacy broadcast helper (kept for admin/cron uses)
 const { WebSocketServer: _WSSLegacy } = require("ws");
-const wss = new _WSSLegacy({ server, path: "/ws/legacy" });
+const legacyWss = new _WSSLegacy({ noServer: true });
 function broadcast(payload) {
   const msg = JSON.stringify(payload);
-  for (const client of wss.clients) {
+  for (const client of legacyWss.clients) {
     if (client.readyState === 1) client.send(msg);
   }
 }
-wss.on("connection", (ws) => {
+legacyWss.on("connection", (ws) => {
   ws.send(JSON.stringify({ type: "welcome", message: "GovMatch AI connected." }));
   ws.on("close", () => {});
+});
+
+// Single upgrade dispatcher for both WebSocket paths
+server.on("upgrade", (request, socket, head) => {
+  try {
+    const { pathname } = new URL(request.url, `http://${request.headers.host || "localhost"}`);
+    if (pathname === "/ws/notifications") {
+      notifWss.handleUpgrade(request, socket, head, (ws) => {
+        notifWss.emit("connection", ws, request);
+      });
+    } else if (pathname === "/ws/legacy") {
+      legacyWss.handleUpgrade(request, socket, head, (ws) => {
+        legacyWss.emit("connection", ws, request);
+      });
+    } else {
+      socket.destroy();
+    }
+  } catch (_) {
+    socket.destroy();
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -137,12 +167,20 @@ app.get("/api/schemes", (req, res) => {
   );
   if (level)    results = results.filter(s => s.level?.toLowerCase() === level.toLowerCase());
   if (search) {
-    const q = search.toLowerCase();
-    results = results.filter(s =>
-      s.name?.toLowerCase().includes(q) ||
-      s.brief_description?.toLowerCase().includes(q) ||
-      s.ministry?.toLowerCase().includes(q)
-    );
+    const q = search.toLowerCase().trim();
+    const terms = q.split(/\s+/).filter(Boolean);
+    results = results.filter(s => {
+      const targetText = [
+        s.name,
+        s.brief_description,
+        s.category,
+        s.benefits,
+        s.eligibility,
+        s.ministry,
+        s.state,
+      ].filter(Boolean).join(" ").toLowerCase();
+      return targetText.includes(q) || (terms.length > 1 && terms.every(t => targetText.includes(t)));
+    });
   }
 
   res.json(paginate(results, parseInt(page), parseInt(limit)));

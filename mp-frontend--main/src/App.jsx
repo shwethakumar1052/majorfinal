@@ -6,6 +6,7 @@ import Footer        from "./components/Footer";
 import AuthModal     from "./components/AuthModal";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ChatBot       from "./components/ChatBot";
+import { profileAPI } from "./services/apiService";
 
 import Home                     from "./pages/Home";
 import EligibilityQuestionnaire from "./pages/EligibilityQuestionnaire";
@@ -38,14 +39,64 @@ export default function App() {
 
   function handleAuthChange(u) {
     setUser(u);
-    if (u) localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(u));
-    else    localStorage.removeItem(STORAGE_USER_KEY);
+    if (u) {
+      localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(u));
+      // Load profile from database after successful login
+      loadUserProfile();
+    } else {
+      localStorage.removeItem(STORAGE_USER_KEY);
+      localStorage.removeItem("govmatch_token");
+    }
   }
 
   function handleLogout() {
     setUser(null);
     localStorage.removeItem(STORAGE_USER_KEY);
+    localStorage.removeItem("govmatch_token");
   }
+
+  // Load user profile from database on mount if logged in
+  async function loadUserProfile() {
+    const token = localStorage.getItem("govmatch_token");
+    if (token) {
+      try {
+        const response = await profileAPI.getProfile();
+        if (response.profile) {
+          // Merge database profile into localStorage for backward compatibility
+          const existingLocal = JSON.parse(localStorage.getItem("govmatch_profile") || "{}");
+          const merged = {
+            ...existingLocal,
+            age: response.profile.age ?? existingLocal.age,
+            gender: response.profile.gender ?? existingLocal.gender,
+            state: response.profile.state ?? existingLocal.state,
+            district: response.profile.district ?? existingLocal.district,
+            area: response.profile.area ?? existingLocal.area,
+            occupation: response.profile.occupation ?? existingLocal.occupation,
+            employmentStatus: response.profile.employmentStatus ?? existingLocal.employmentStatus,
+            annualIncome: response.profile.annualIncome ?? existingLocal.annualIncome,
+            education: response.profile.education ?? existingLocal.education,
+            caste: response.profile.caste ?? existingLocal.caste,
+            minority: response.profile.minority ?? existingLocal.minority,
+            disability: response.profile.disability ?? existingLocal.disability,
+            bplCard: response.profile.bplCard ?? existingLocal.bplCard,
+            isStudent: response.profile.isStudent ?? existingLocal.isStudent,
+            isWidow: response.profile.isWidow ?? existingLocal.isWidow,
+            goal: response.profile.goal ?? existingLocal.goal,
+          };
+          localStorage.setItem("govmatch_profile", JSON.stringify(merged));
+        }
+      } catch (error) {
+        console.warn("Could not load profile from database:", error);
+      }
+    }
+  }
+
+  // Load profile on mount if user is already logged in
+  useEffect(() => {
+    if (user) {
+      loadUserProfile();
+    }
+  }, []); // Run once on mount
 
   return (
     <BrowserRouter>

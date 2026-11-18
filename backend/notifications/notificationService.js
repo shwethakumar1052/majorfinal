@@ -144,9 +144,8 @@ function clearNotifications() {
  *
  * @param {import("http").Server} httpServer
  */
-function initWebSocketServer(httpServer) {
-  // Use a path so it doesn't conflict with any existing WS setup
-  wss = new WebSocketServer({ server: httpServer, path: "/ws/notifications" });
+function initWebSocketServer() {
+  wss = new WebSocketServer({ noServer: true });
 
   wss.on("connection", (ws, req) => {
     console.log("[WS] Notification client connected.");

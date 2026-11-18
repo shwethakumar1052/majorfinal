@@ -57,14 +57,15 @@ export default function SchemeSearch() {
     gender:   "",
   });
 
-  const fetchSchemes = useCallback(async (pg = 1) => {
+  const fetchSchemes = useCallback(async (pg = 1, overrideQuery) => {
     setLoading(true);
     try {
+      const activeQ = overrideQuery !== undefined ? overrideQuery : query;
       const params = new URLSearchParams({ page: pg, limit: 12 });
-      if (query)           params.set("search", query);
+      if (activeQ)          params.set("search", activeQ);
       if (filters.category) params.set("category", filters.category);
-      if (filters.state)   params.set("state", filters.state);
-      if (filters.level)   params.set("level", filters.level);
+      if (filters.state)    params.set("state", filters.state);
+      if (filters.level)    params.set("level", filters.level);
       const res = await axios.get(`/api/schemes?${params}`);
       setSchemes(res.data.data || []);
       setTotal(res.data.pagination?.total || 0);
@@ -72,6 +73,16 @@ export default function SchemeSearch() {
     } catch { setSchemes([]); }
     finally { setLoading(false); }
   }, [query, filters]);
+
+  // Keep query and filters synchronized with URL params
+  useEffect(() => {
+    const urlQ = searchParams.get("q") ?? "";
+    setQuery(urlQ);
+    const cat = searchParams.get("category") || "";
+    if (cat) {
+      setFilters(f => ({ ...f, category: cat }));
+    }
+  }, [searchParams]);
 
   useEffect(() => { fetchSchemes(1); }, [filters]);
 
@@ -81,6 +92,17 @@ export default function SchemeSearch() {
     return () => clearTimeout(t);
   }, [query]);
 
+  function handleSearchSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    fetchSchemes(1);
+    setSearchParams(prev => {
+      const p = new URLSearchParams(prev);
+      if (query.trim()) p.set("q", query.trim());
+      else p.delete("q");
+      return p;
+    });
+  }
+
   function clearFilter(key) { setFilters(f => ({ ...f, [key]: "" })); }
 
   const activeFilters = Object.entries(filters).filter(([, v]) => v);
@@ -88,29 +110,56 @@ export default function SchemeSearch() {
   return (
     <div className="flex flex-col gap-6 page-enter">
       {/* ── Search header ── */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <div className="relative flex-1">
+      <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div className="relative flex-1 w-full">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
-          <input value={query} onChange={e => setQuery(e.target.value)}
-            placeholder={t("search_placeholder")}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none"
-            style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }} />
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder={t("search_placeholder") || "Search schemes, ministries, benefits..."}
+            className="w-full pl-9 pr-24 py-2.5 rounded-xl text-sm outline-none"
+            style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                fetchSchemes(1, "");
+                setSearchParams(prev => {
+                  const p = new URLSearchParams(prev);
+                  p.delete("q");
+                  return p;
+                });
+              }}
+              className="absolute right-16 top-1/2 -translate-y-1/2 p-1 text-xs opacity-60 hover:opacity-100"
+              title="Clear"
+            >
+              <X size={14} />
+            </button>
+          )}
+          <button
+            type="submit"
+            className="btn-primary absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 text-xs rounded-lg font-semibold cursor-pointer"
+          >
+            Search
+          </button>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setFiltersOpen(v => !v)} className="btn-ghost flex items-center gap-2 text-sm">
+          <button type="button" onClick={() => setFiltersOpen(v => !v)} className="btn-ghost flex items-center gap-2 text-sm">
             <SlidersHorizontal size={15} />
             {t("filters")} {activeFilters.length > 0 && <span className="badge-education badge text-xs px-1.5">{activeFilters.length}</span>}
           </button>
-          <button onClick={() => setView("grid")} className={`btn-ghost p-2.5 ${view === "grid" ? "border-indigo-400" : ""}`}
+          <button type="button" onClick={() => setView("grid")} className={`btn-ghost p-2.5 ${view === "grid" ? "border-indigo-400" : ""}`}
                   style={{ color: view === "grid" ? "var(--accent)" : "var(--text-muted)" }} title={t("grid_view")}>
             <LayoutGrid size={16} />
           </button>
-          <button onClick={() => setView("list")} className={`btn-ghost p-2.5 ${view === "list" ? "border-indigo-400" : ""}`}
+          <button type="button" onClick={() => setView("list")} className={`btn-ghost p-2.5 ${view === "list" ? "border-indigo-400" : ""}`}
                   style={{ color: view === "list" ? "var(--accent)" : "var(--text-muted)" }} title={t("list_view")}>
             <List size={16} />
           </button>
         </div>
-      </div>
+      </form>
 
       {/* ── Filter sidebar (collapsible on mobile) ── */}
       <div className="flex gap-6">
